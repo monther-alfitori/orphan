@@ -1,0 +1,232 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Orphans App</title>
+  <link rel="icon" type="image/x-icon" href="{% static 'images/squareLogo.png' %}">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@100;200;300;400;500;600;700&display=swap');
+    * {
+      font-family: "IBM Plex Sans Arabic", sans-serif !important;
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    .hideInWideScreens {
+      display: none;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f7f8fa;
+      margin: 0;
+      padding: 60px 0 0 0;
+      direction: rtl;
+    }
+    a {
+      color: #000;
+      text-decoration: none;
+    }
+
+    .newSponsor {
+      width: 500px;
+      height: auto;
+      margin: auto;
+      text-align: center;
+      animation: fadeIn 0.3s;
+      scrollbar-width: none;
+      margin-bottom: 100px;
+    }
+    .newSponsor .topLogo img {
+      width: 160px;
+      margin-bottom: 20px;
+    }
+    .newSponsor h2 {
+      font-size: 25px;
+      margin-bottom: 20px;
+    }
+    .newSponsor p {
+      font-size: 18px;
+      margin-bottom: 15px;
+    }
+
+    /* Success message styling */
+    .success-message {
+      background-color: #d4edda;
+      color: #155724;
+      padding: 10px;
+      border-radius: 5px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    /* Close button */
+    .newSponsor .modal-close {
+      position: absolute;
+      top: 15px;
+      left: 25px;
+      cursor: pointer;
+      font-size: 35px;
+      font-weight: 200;
+      transition: ease-in-out 0.3s all;
+    }
+    .newSponsor .modal-close:hover {
+      transform: scale(1.1);
+      color: rgb(206, 68, 68);
+    }
+    .newSponsor .modal-save {
+      margin-top: 40px;
+      width: 140px;
+      display: block;
+      margin-left: auto;
+      padding: 8px 25px;
+      font-size: 16px;
+      background-color: #6c5ce7;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: ease-in-out 0.3s all;
+    }
+
+    .newSponsor .modal-save:hover {
+      transform: scale(1.1);
+      color: #5445c0;
+      color: #fff;
+    }
+
+
+    .newSponsor .sponsorForm input,
+    .sponsorForm select {
+      width: 100%;
+      padding: 12px ;
+      margin: 8px 0;
+      border: 2px solid #dddddd;
+      border-radius: 6px;
+      background-color: #f5f5f5;
+      font-size: 14px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      transition: all 0.3s ease;
+      text-align: right;
+    }
+
+    .newSponsor .sponsorForm input:focus,
+    .newSponsor .sponsorForm select:focus {
+      outline: none;
+      background-color: #ffffff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+
+    .newSponsor .sponsorForm input::placeholder {
+      color: #999;
+    }
+
+    .newSponsor .sponsorForm select {
+      appearance: none;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: left 10px center;
+      background-size: 15px;
+    }
+
+    @media (max-width: 1000px) {
+    .newSponsor {
+      width: 90%;
+      
+    }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="newSponsor">
+    <div class="topLogo">
+      <img src="{% static 'images/logo.png' %}" alt="">
+    </div>
+    <!-- Display success message if it exists -->
+    {% if success_message %}
+      <div class="success-message">
+        {{ success_message }}
+      </div>
+    {% endif %}
+      
+    <h2>بيانات الكفيل</h2>
+    <form id="sponsorForm" class="sponsorForm" method="post">
+      {% csrf_token %}
+      <!-- Name -->
+      <input type="text" id="name" name="name" placeholder="اسم الكفيل" required><br>
+
+      <!-- City Selection -->
+      <select id="residence_location" name="residence_location" required>
+        <option value="" disabled selected>اختر مكان الإقامة</option>
+        <option value="مصراتة">مصراتة</option>
+        <option value="طرابلس">طرابلس</option>
+        <option value="زليتن">زليتن</option>
+        <option value="الخمس">الخمس</option>
+        <option value="بنغازي">بنغازي</option>
+        <option value="مسلاتة">مسلاتة</option>
+        <option value="الزاوية">الزاوية</option>
+      </select><br>
+
+      <!-- Phone Numbers -->
+      <input type="tel" id="primary_phone" name="primary_phone" placeholder="رقم الهاتف" pattern="[0-9]{10}" required><br>
+      <input type="tel" id="secondary_phone" name="secondary_phone" placeholder="رقم هاتف آخر" pattern="[0-9]{10}"><br>
+
+      <!-- Sponsorship Amount -->
+      <select id="sponsorship_amount" name="sponsorship_amount" required>
+        <option value="" selected>اختر قيمة الكفالة الشهرية</option>
+        <option value="700">700 </option>
+        <option value="600">600 </option>
+        <option value="500">500 </option>
+        <option value="400">400 </option>
+        <option value="300">300 </option>
+        <option value="200">200 </option>
+        <option value="100">100 </option>
+      </select><br>
+
+      <!-- Custom Amount -->
+      <input type="number" id="custom_amount" name="custom_amount" placeholder="قيمة مخصصة (إذا كانت أكبر من 700 دينار)"><br>
+
+      <!-- Payment Frequency -->
+      <select id="payment_frequency" name="payment_frequency" required>
+        <option value="" disabled selected>اختر نظام الدفع</option>
+        <option value="سنوي">سنوي</option>
+        <option value="نصف سنوي">نصف سنوي</option>
+        <option value="ربع سنوي">ربع سنوي</option>
+        <option value="شهري">شهري</option>
+      </select><br>
+
+      <!-- Initial Payment Timing -->
+      <select id="initial_payment_timing" name="initial_payment_timing" required>
+        <option value="" disabled selected>موعد تسليم الدفعة الأولى</option>
+        <option value="بداية من هذا الشهر">بداية من هذا الشهر</option>
+        <option value="بداية من الشهر القادم">بداية من الشهر القادم</option>
+      </select><br>
+
+      <!-- Payment Method -->
+      <select id="payment_method" name="payment_method" required>
+        <option value="" disabled selected>اختر وسيلة الدفع</option>
+        <option value="نقدي">نقدي</option>
+        <option value="التحويل عن طريق مكاتب الصرافة الخاصة">التحويل عن طريق مكاتب الصرافة الخاصة</option>
+        <option value="التحويل المصرفي">التحويل المصرفي</option>
+        <option value="البطاقة المصرفية">البطاقة المصرفية</option>
+      </select><br>
+
+      <!-- Orphan Selection -->
+      <select id="orphan_selection" name="orphan_selection" required>
+        <option value="" disabled selected>اختيار اليتيم</option>
+        <option value="أريد اختيار اليتيم بنفسي">أريد اختيار اليتيم بنفسي</option>
+        <option value="أفوض الحملة في اختيار اليتيم وفق المتبع لديها وابلاغي بالمعلومات">أفوض الحملة في اختيار اليتيم وفق المتبع لديها وابلاغي بالمعلومات</option>
+        <option value="غير مهتم بالحصول على معلومات عن اليتيم مع متابعة تسليم دفعات الكفالة">غير مهتم بالحصول على معلومات عن اليتيم مع متابعة تسليم دفعات الكفالة</option>
+      </select><br>
+
+      <!-- Submit Button -->
+      <button type="submit" class="modal-save">إرسال</button>
+    </form>
+  </div>
+
+  {% include 'components/footer.html' %}
+</body>
+</html>

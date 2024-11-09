@@ -1,0 +1,186 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Orphans App</title>
+  <link rel="icon" type="image/x-icon" href="{% static 'images/squareLogo.png' %}">
+  </head>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@100;200;300;400;500;600;700&display=swap');
+    * {
+      font-family: "IBM Plex Sans Arabic", sans-serif !important;
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    .hideInWideScreens {
+      display: none;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f7f8fa;
+      margin: 0;
+      padding: 150px 0 0 0;
+      direction: rtl;
+    }
+body a {
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.section1 {
+  justify-content: center;
+  align-items: center;
+  height: auto;
+  font-size: 16px;
+  padding-bottom: 50px;
+  
+}
+.container {
+  width: 500px;
+  margin: auto;
+}
+.container .forms {
+  width: 100%;
+  text-align: center;
+ }
+.container .forms .form {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  height: 480px;
+  transition: all 0.5s ease-in;
+}
+.container .forms .form h3 {
+  font-size: 40px;
+  margin-bottom: 30px;
+  font-weight: 700;
+  text-align: center;
+}
+.container .forms .form form {
+  display: flex;
+  flex-direction: column;
+  text-align: right;
+}
+.container .forms .form form #username {
+  width: 100%;
+    padding: 15px;
+    margin: 8px 0;
+    border: 2px solid #dddddd;
+    border-radius: 12px;
+    background-color: #f5f5f5;
+    font-size: 16px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    text-align: right;
+}
+.container .forms .form form #username:focus {
+            outline: none;
+}
+.container .forms .form form #password1 {
+  width: 100%;
+    padding: 15px;
+    margin: 8px 0;
+    border: 2px solid #dddddd;
+    border-radius: 12px;
+    background-color: #f5f5f5;
+    font-size: 16px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    text-align: right;
+}
+.container .forms .form form #password1:focus {
+            background-color: #ffffff;
+}
+.container .forms .form form #password2 {
+  width: 100%;
+    padding: 15px;
+    margin: 8px 0;
+    border: 2px solid #dddddd;
+    border-radius: 12px;
+    background-color: #f5f5f5;
+    font-size: 16px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    text-align: right;
+}
+.container .forms .form form #password2:focus {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.container .form input::placeholder {
+          color: #999;
+        }
+
+.container .forms .form form #submit {
+      padding: 10px 30px;
+      background-color: #6c5ce7;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: ease-in-out 0.3s all;
+      width: 150px; 
+      margin: auto;
+      margin-top: 20px;
+      font-size: 18px;
+
+    }
+    .container .forms .form form #submit:hover {
+      transform: scale(1.1);
+      color: #5445c0;
+      color: #fff;
+    }
+.container .forms .form span {
+  margin: 10px 0px;
+}
+
+
+@media screen and (max-width: 1000px) {
+    .container {
+      width:  95%;
+      
+    }
+}
+
+
+
+</style>
+<body>
+  {% include 'components/header.html' %}
+
+<div class="section1">
+    <div class="container">
+      <div class="forms">
+        <div class="form">
+          <h3>تسجيل الدخول</h3>
+          <form method="POST">
+                {% csrf_token %}
+                <input type="text" name="username" id="username" class="username" placeholder="قم بإخال اسم المستخدم الخاص بك"/><br>
+                <input type="password" name="password" id="password1" class="password" placeholder="أدخل كلمة المرور"/><br>
+                <button id="submit" type="submit" class="btn btn-primary">تسجيل</button>
+              </form>
+        </div>
+      </div>
+    </div>
+</div>
+{% include 'components/footer.html' %}
+
+
+
+
+<script>
+$('#username, #password').on('input', function() {
+    if ($('#username').val() && $('#password').val()) {
+        $('.login').addClass('buttonafter');
+    } else {
+        $('.login').removeClass('buttonafter');
+    }
+});
+</script>
+</body>
+</html>

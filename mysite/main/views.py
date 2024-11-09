@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from rest_framework import viewsets, filters
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import Sponsor
@@ -13,6 +13,43 @@ import json
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from django.utils import timezone
+from django.contrib.auth import authenticate, login, logout
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+
+
+def loginPage(request):
+    page = 'loginPage'
+    
+    if request.method == 'POST':
+        username = request.POST.get('username').lower()
+        password = request.POST.get('password')
+        
+        try:
+            user = User.objects.get(username=username, password=password)
+        except:
+            messages.error(request, "Invalid username or password!")
+
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            login(request, user)
+            if 'next' in request.GET:
+                return redirect(request.GET['next'])
+            else:
+                return redirect('home')
+        else:
+            messages.error(request, "This user does not exist!")
+
+    if request.user.is_authenticated:
+        if 'next' in request.GET:
+            return redirect(request.GET['next'])
+        else:
+            return redirect('home')    
+    context = {'page': page}
+    return render(request, 'login.html', context)
+
+
 
 
 def home(request):
@@ -31,6 +68,52 @@ def home(request):
     }
     return render(request, 'home.html', context)
 
+
+from django.shortcuts import render, redirect
+from django.http import JsonResponse
+from django.utils import timezone
+from django.views.decorators.csrf import csrf_exempt
+
+@csrf_exempt
+def new_sponsor(request):
+    if request.method == "POST":
+        # Retrieve form data
+        name = request.POST.get("name")
+        residence_location = request.POST.get("residence_location")
+        primary_phone = request.POST.get("primary_phone")
+        secondary_phone = request.POST.get("secondary_phone")
+        sponsorship_amount = request.POST.get("sponsorship_amount")
+        custom_amount = request.POST.get("custom_amount")
+        payment_frequency = request.POST.get("payment_frequency")
+        initial_payment_timing = request.POST.get("initial_payment_timing")
+        payment_method = request.POST.get("payment_method")
+        orphan_selection = request.POST.get("orphan_selection")
+
+        # Validate required fields
+        if not all([name, residence_location, primary_phone, sponsorship_amount,
+                   payment_frequency, initial_payment_timing, payment_method, orphan_selection]):
+            return JsonResponse({"success": False, "error": "Missing required fields"}, status=400)
+
+        # Create the sponsor entry
+        sponsor = Sponsor.objects.create(
+            name=name,
+            residence_location=residence_location,
+            primary_phone=primary_phone,
+            secondary_phone=secondary_phone,
+            sponsorship_amount=int(sponsorship_amount),
+            custom_amount=int(custom_amount) if custom_amount else None,
+            payment_frequency=payment_frequency,
+            initial_payment_timing=initial_payment_timing,
+            payment_method=payment_method,
+            orphan_selection=orphan_selection,
+            submitted_at=timezone.now()
+        )
+
+        # Set a success message to be displayed after redirect
+        return render(request, 'new_sponsor.html', {"success_message": "تم تسجيل بياناتك بنجاح!"})
+    
+    # If not POST, just render the form normally
+    return render(request, 'new_sponsor.html')
 
 
 
@@ -90,6 +173,7 @@ def add_sponsor(request):
 
 
 
+
 def edit_sponsor(request):
     if request.method == 'POST':
         try:
@@ -134,6 +218,22 @@ def edit_sponsor(request):
     else:
         return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=400)
 
+
+@login_required
+@csrf_exempt
+def delete_sponsor(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            sponsor_id = data.get("id")
+            sponsor = Sponsor.objects.get(id=sponsor_id)
+            sponsor.delete()
+            return JsonResponse({"success": True})
+        except Sponsor.DoesNotExist:
+            return JsonResponse({"success": False, "error": "Sponsor not found."})
+        except Exception as e:
+            return JsonResponse({"success": False, "error": str(e)})
+    return JsonResponse({"success": False, "error": "Invalid request method."})
 
 
 
