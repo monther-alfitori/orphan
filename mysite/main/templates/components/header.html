@@ -1,0 +1,233 @@
+
+{% load static %}
+<style>
+
+
+.header {
+    max-width: 100%;
+    margin: auto;
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    align-items: center;
+    padding: 5px 10% 0 10%;
+    background-color: #f7f8fa;
+    direction: rtl;
+    transition: background-color 0.3s ease, border-bottom 0.3s ease;
+    z-index: 3;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+}
+
+.header .logo {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.header .logo img {
+    width: 160px;
+}
+
+.social-icons {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-right: auto;
+    transition: all 0.3s ease;
+}
+
+.social-icons .icon {
+    color: #333;
+    text-decoration: none;
+    background-color: #f0f0f0;
+    padding: 8px 8px 2px 8px;
+    border-radius: 8px;
+    text-align: center;
+    transition: ease-in-out 0.3s all;
+    cursor: pointer;
+}
+.social-icons .icon span {
+    font-size: 18px;
+    font-weight: 400;
+    color: #f0f0f0;
+    font-family: "Zain", serif;
+    display: inline-block;
+    position: relative;
+    bottom: -12px;
+    left: 0px;
+    width: 25px;
+    height: 25px;
+    background-color: #000;
+    border-radius: 5px;
+    line-height: 1.5;
+}
+.social-icons .lightIcon {
+    background-color: #6c5ce7;
+}
+.social-icons .icon:hover {
+    transform: scale(1.05);
+    background-color: #e0e0e0;
+}
+
+.social-icons .icon svg {
+    width: 25px;
+    height: 25px;
+    fill: currentColor;
+    stroke: #6c5ce7;
+}
+
+/* Hamburger Menu Button for Mobile */
+.menu-button {
+    display: none;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 10px 10px 5px 10px;
+    background-color: #f0f0f0;
+    border-radius: 8px;
+    margin-right: auto;;
+    margin-left: 10px;
+}
+.menu-button:hover {
+    transform: scale(1.05);
+    background-color: #e0e0e0;
+}
+.menu-button svg {
+    width: 30px;
+    height: 30px;
+}
+
+
+
+
+/* Responsive Styles */
+@media screen and (max-width: 900px) {
+    .header {
+        padding: 5px 10px;
+        direction: rtl;
+        grid-template-columns: 160px 1fr;
+    }
+
+    .social-icons {
+        display: none; /* Hide social icons initially */
+        flex-direction: column;
+        position: absolute;
+        top: 85px;
+        left: 0;
+        background-color: #fff;
+        padding: 50px 20px;
+        width: 100%;
+        height: 100vh;
+
+    }
+    .social-icons .icon {
+    padding: 15px 15px 15px 15px;
+    border-radius: 8px;
+        margin-left: auto;
+        width: 100%;
+        display: grid;
+        grid-template-columns: 35px 1fr;
+        gap: 10px;
+        align-items: center;
+    }
+    .social-icons .icon h4 {
+        display: inline;
+        background-color: #6c5ce7;
+        color: #fff;
+        border-radius: 8px;
+        padding: 10px;
+    }
+    .social-icons .lightIcon h4 {
+        display: inline;
+        background-color: #f0f0f0;
+        color: #6c5ce7;
+        border-radius: 8px;
+        padding: 10px;
+    }
+    .social-icons .icon svg {
+    width: 35px;
+    height: 35px;
+    fill: currentColor;
+    stroke: #6c5ce7;
+}
+    .social-icons.show {
+        display: flex; /* Show when toggled */
+    }
+
+    .menu-button {
+        display: inline-block; /* Show menu button on mobile */
+    }
+}
+
+</style>
+
+<body>
+    <header class="header">
+        <div class="logo">
+            <a  href="{% url 'home' %}">
+                <img src="{% static 'images/logo.png' %}" alt="">
+            </a>
+        </div>
+    
+        <!-- Menu Button for Mobile -->
+        <button class="menu-button" onclick="toggleMenu()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                <path fill="none" stroke="#333" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 5h18M3 12h18M3 19h18"/>
+            </svg>
+
+        </button>
+    
+        <div class="social-icons">
+            <a href="" target="_blank" class="icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 24 24">
+                  <path fill="none" stroke="#6c5ce7" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6.182 10.333c-.978 0-1.182.192-1.182 1.111v1.667c0 .92.204 1.111 1.182 1.111h2.363v6.667c0 .92.205 1.111 1.182 1.111h2.364c.978 0 1.182-.192 1.182-1.111v-6.667h2.654c.741 0 .932-.135 1.136-.806l.507-1.666c.349-1.149.133-1.417-1.137-1.417h-3.16V7.556c0-.614.529-1.112 1.181-1.112h3.364c.978 0 1.182-.191 1.182-1.11V3.11C19 2.191 18.796 2 17.818 2h-3.364c-3.263 0-5.909 2.487-5.909 5.556v2.777z" color="#F3DE09"/>
+                </svg>
+                <h4 class="hideInWideScreens">صفحة الفيسبوك</h4>
+
+              </a> 
+    
+              <a href="" target="_blank" class="icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 24 24">
+                  <g fill="none" stroke="#6c5ce7" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" color="#F3DE09">
+                    <path d="M2.5 12c0-4.478 0-6.718 1.391-8.109S7.521 2.5 12 2.5c4.478 0 6.718 0 8.109 1.391S21.5 7.521 21.5 12c0 4.478 0 6.718-1.391 8.109S16.479 21.5 12 21.5c-4.478 0-6.718 0-8.109-1.391S2.5 16.479 2.5 12"/>
+                    <path d="M16.5 12a4.5 4.5 0 1 1-9 0a4.5 4.5 0 0 1 9 0m1.008-5.5h-.01"/>
+                  </g>
+                </svg>
+                <h4 class="hideInWideScreens">مجموعة الواتسآب</h4>
+
+              </a>
+    
+    
+              <a href="" target="_blank" class="icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="m5.253 4.196l-1.227.712c-.989.573-1.483.86-1.754 1.337C2 6.722 2 7.302 2 8.464v8.164c0 1.526 0 2.29.342 2.714c.228.282.547.472.9.535c.53.095 1.18-.282 2.478-1.035c.882-.511 1.73-1.043 2.785-.898c.48.065.937.293 1.853.748l3.813 1.896c.825.41.833.412 1.75.412H18c1.886 0 2.828 0 3.414-.599c.586-.598.586-1.562.586-3.49v-6.74c0-1.927 0-2.89-.586-3.49c-.586-.598-1.528-.598-3.414-.598h-2.079c-.917 0-.925-.002-1.75-.412L10.84 4.015C9.449 3.323 8.753 2.977 8.012 3S6.6 3.415 5.253 4.196M15 6.5v14m-7-17v14" color="currentColor"/></svg>
+                <h4 class="hideInWideScreens">موقع المنظمة</h4>
+
+            </a>
+              <a href="" class="icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" color="currentColor"><path d="m2 6l6.913 3.917c2.549 1.444 3.625 1.444 6.174 0L22 6"/><path d="M2.016 13.476c.065 3.065.098 4.598 1.229 5.733c1.131 1.136 2.705 1.175 5.854 1.254c1.94.05 3.862.05 5.802 0c3.149-.079 4.723-.118 5.854-1.254c1.131-1.135 1.164-2.668 1.23-5.733c.02-.986.02-1.966 0-2.952c-.066-3.065-.099-4.598-1.23-5.733c-1.131-1.136-2.705-1.175-5.854-1.254a115 115 0 0 0-5.802 0c-3.149.079-4.723.118-5.854 1.254c-1.131 1.135-1.164 2.668-1.23 5.733a69 69 0 0 0 0 2.952"/></g></svg>
+                <h4 class="hideInWideScreens">البريد الإلكتروني</h4>
+            </a>
+            
+              <a href="" class="icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3.778 11.942C2.83 10.29 2.372 8.94 2.096 7.572c-.408-2.024.526-4.001 2.073-5.263c.654-.533 1.404-.35 1.791.343l.873 1.567c.692 1.242 1.038 1.862.97 2.52c-.069.659-.536 1.195-1.469 2.267zm0 0c1.919 3.346 4.93 6.36 8.28 8.28m0 0c1.653.948 3.002 1.406 4.37 1.682c2.024.408 4.001-.526 5.262-2.073c.534-.654.351-1.404-.342-1.791l-1.567-.873c-1.242-.692-1.862-1.038-2.52-.97c-.659.069-1.195.536-2.267 1.469z" color="currentColor"/></svg>
+                <h4 class="hideInWideScreens">اتصل بنا</h4>
+            </a>
+
+              <a href="" class="icon lightIcon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="none" stroke="#000000" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7.023 5.5a9 9 0 1 0 9.953 0M12 2v8" color="#000000"/></svg>
+                <h4 class="hideInWideScreens">تسجيل الدخول</h4>
+
+            </a>
+
+
+        </div>
+    </header>
+    
+    <script>
+        function toggleMenu() {
+            const socialIcons = document.querySelector('.social-icons');
+            socialIcons.classList.toggle('show');
+        }
+    </script>
+    </body>

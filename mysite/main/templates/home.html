@@ -1,0 +1,870 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Orphans App</title>
+  <link rel="icon" type="image/x-icon" href="{% static 'images/squareLogo.png' %}">
+  </head>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@100;200;300;400;500;600;700&display=swap');
+    * {
+      font-family: "IBM Plex Sans Arabic", sans-serif !important;
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    .hideInWideScreens {
+      display: none;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f7f8fa;
+      margin: 0;
+      padding: 150px 0 0 0;
+      direction: rtl;
+    }
+
+    .stats {
+      max-width: 80%;
+      margin: auto;
+      margin-bottom: 80px;
+      background-color: #6c5ce7;
+      border-radius: 16px;
+      padding: 60px 80px;
+      box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+    }
+    .stats .row {
+      display: flex;
+      justify-content: space-between;
+    }
+    .stats .row .col {
+      color: #fff;
+    }
+
+    /* Toolbar */
+    .toolbar {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      max-width: 80%;
+      margin: auto;
+      margin-bottom: 20px;
+      align-items: center;
+    }
+    .toolbar h3 {
+      text-align: right;
+      margin-left: auto;
+      font-size: 25px;
+      display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    }
+    .toolbar .icon-button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      margin-top: 5px;
+    }
+    .toolbar .icon-button svg {
+      width: 25px;
+      height: 25px;
+      transition: ease-in-out 0.3s;
+      filter: opacity(0.75);
+    }
+    .toolbar .icon-button svg:hover {
+      transform: scale(1.1);
+      filter: opacity(1);
+    }
+
+    /* Search field */
+    .toolbar .search-input {
+      display: none;
+      border: 1px solid #ccc;
+      padding: 5px;
+      border-radius: 6px;
+      width: 0;
+      transition: width 1s ease;
+      outline: none;
+    }
+    .toolbar .search-input.show {
+      display: inline-block;
+      width: 300px;
+    }
+
+    /* Add New Sponsor Button */
+    .toolbar .add-sponsor-btn {
+      padding: 5px 20px;
+      background-color: #6c5ce7;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: ease-in-out 0.3s all;
+    }
+    .toolbar .add-sponsor-btn:hover {
+      background-color: #5647ca;
+    }
+
+    /* Grid Container */
+    .grid-container {
+      display: grid;
+      grid-template-columns: 1fr;
+      max-width: 80%;
+      margin: auto;
+    }
+
+    /* Sponsor Header */
+    .grid-container .sponsor-header {
+      background-color: #6c5ce7;
+      padding: 15px;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      cursor: pointer;
+      transition: transform 0.2s;
+      border-top-right-radius: 8px;
+      border-top-left-radius: 8px;
+    }
+    .grid-container .sponsor-header .sponsor-details {
+      display: grid;
+      grid-template-columns: 50px 1fr 1fr 1fr 1fr 1fr;
+    }
+    .grid-container .sponsor-header .sponsor-details p {
+      color: #fff;
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    /* Sponsor Card */
+    .grid-container .sponsor-card {
+      background-color: #f7f8fa;
+      padding: 15px;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      cursor: pointer;
+      transition: transform 0.5s;
+      border-bottom: 1px solid #eaeaea;
+    }
+    .grid-container .sponsor-card:hover {
+      background-color: #00000004;
+    }
+    .grid-container .sponsor-card .sponsor-details {
+      display: grid;
+      grid-template-columns: 50px 1fr 1fr 1fr 1fr 1fr;
+    }
+    .grid-container .sponsor-card .sponsor-details p {
+      color: #000;
+      font-size: 16px;
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      background-color: rgba(0, 0, 0, 0.7);
+      align-items: center;
+      justify-content: center;
+      z-index: 4;
+    }
+    .modal-content {
+      background-color: #fff;
+      max-height: 100vh;
+      overflow-y: auto;
+      padding: 80px 100px 100px 100px;
+      width: 700px;
+      height: auto;
+      margin: auto;
+      text-align: right;
+      position: relative;
+      animation: fadeIn 0.3s;
+      scrollbar-width: none;
+    }
+    .modal-content h2 {
+      font-size: 25px;
+      margin-bottom: 20px;
+    }
+    .modal-content p {
+      font-size: 18px;
+      margin-bottom: 15px;
+    }
+
+    /* Close button */
+    .modal-close {
+      position: absolute;
+      top: 15px;
+      left: 25px;
+      cursor: pointer;
+      font-size: 35px;
+      font-weight: 200;
+      transition: ease-in-out 0.3s all;
+    }
+    .modal-close:hover {
+      transform: scale(1.1);
+      color: rgb(206, 68, 68);
+    }
+    .modal-print, .modal-save {
+      margin-top: 40px;
+      padding: 7px 30px;
+      background-color: #6c5ce7;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: ease-in-out 0.3s all;
+    }
+    .modal-print:hover {
+      transform: scale(1.1);
+      color: #5445c0;
+      color: #fff;
+    }
+    .modal-save:hover {
+      transform: scale(1.1);
+      color: #5445c0;
+      color: #fff;
+    }
+    .modal-edit {
+      margin-top: 40px;
+      padding: 7px 30px;
+      background-color: #dedede;
+      color: #000;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: ease-in-out 0.3s all;
+    }   
+    .modal-edit:hover {
+      transform: scale(1.1);
+      color: #c0c0c0;
+      color: #000;
+    }
+  
+    .sponsorForm input,
+        .sponsorForm select {
+          width: 100%;
+          padding: 12px;
+          margin: 8px 0;
+          border: none;
+          border-radius: 6px;
+          background-color: #f5f5f5;
+          font-size: 14px;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+          transition: all 0.3s ease;
+          text-align: right;
+        }
+
+        .sponsorForm input:focus,
+        .sponsorForm select:focus {
+          outline: none;
+          background-color: #ffffff;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        .sponsorForm input::placeholder {
+          color: #999;
+        }
+
+        .sponsorForm select {
+          appearance: none;
+          background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+          background-repeat: no-repeat;
+          background-position: left 10px center;
+          background-size: 15px;
+        }
+
+    /* Success message styling */
+    .success-message {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #4b8d4d;
+      color: white;
+      padding: 10px;
+      border-radius: 5px;
+      z-index: 1000;
+    }
+
+    @media (max-width: 1000px) {
+      .grid-container {
+        max-width: 95%;
+      }
+      .stats {
+        max-width: 95%;
+
+      }
+      .toolbar {
+        max-width: 95%;
+
+      }
+}
+
+    @media (max-width: 900px) {
+
+    .stats {
+      background-color: transparent;
+      border-radius: 0;
+      padding: 0 ;
+      box-shadow: none;
+    }
+    .stats .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      justify-content: none;
+    }
+    .stats .row .col {
+      color: #fff;
+      background-color: #6c5ce7;
+      border-radius: 12px;
+      padding: 20px 20px;
+      box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+    }
+    .toolbar .search-input.show {
+      display: block;
+      width: 100%;
+    }
+    .grid-container .sponsor-header .sponsor-details {
+      grid-template-columns: 50px 2fr 1fr;
+    }
+        .grid-container .sponsor-card .sponsor-details {
+      grid-template-columns: 50px 2fr 1fr;
+    }
+    .hideInMobile {
+      display: none;
+    }
+    .hideInWideScreens {
+      display: block;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      background-color: rgba(0, 0, 0, 0.7);
+      align-items: center;
+      justify-content: center;
+      z-index: 4;
+    }
+    .modal-content {
+      padding: 80px 20px 100px 20px;
+      width: 100%;
+    }
+    }
+
+
+  </style>
+<body>
+  {% include 'components/header.html' %}
+
+  <!-- Success Message -->
+  <div id="successMessage" class="success-message" style="display: none;">تم إضافة الكفيل بنجاح!</div>
+
+
+  <!-- Statistics Section -->
+  <div class="stats">
+    <div class="row">
+      <div class="col"><h1>+{{ total_sponsors }}</h1><p>إجمالي عدد الكفيلين</p></div>
+      <div class="col"><h1>+{{ total_amount }}</h1><p>إجمالي التبرعات بالدينار الليبي</p></div>
+      <div class="col"><h1>+{{ active_cities }}</h1><p>إجمالي المدن المشاركة</p></div>
+      <div class="col"><h1>+{{ total_sponsorships }}</h1><p>إجمالي عدد الأيتام المُتكفَل بهم</p></div>
+    </div>
+  </div>
+
+  <!-- Toolbar Section -->
+  <div class="toolbar">
+    <h3>قائمة الكفيلين</h3>
+    <button class="icon-button" onclick="sortByDate()"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 32 32"><path fill="#000000" d="M14.975 3.5a1.25 1.25 0 0 0-2.45-.5L11.2 9.5H5.25a1.25 1.25 0 1 0 0 2.5h5.439L9.26 19H4.25a1.25 1.25 0 0 0 0 2.5h4.5l-1.225 6a1.25 1.25 0 1 0 2.45.5l1.327-6.5h6.948l-1.224 6a1.25 1.25 0 1 0 2.449.5l1.326-6.5h5.949a1.25 1.25 0 1 0 0-2.5h-5.438l1.428-7h5.01a1.25 1.25 0 1 0 0-2.5h-4.5l1.225-6a1.25 1.25 0 0 0-2.45-.5L20.7 9.5h-6.95zM18.76 19h-6.948l1.428-7h6.949z"/></svg></button>
+    <button class="icon-button" onclick="sortByName()"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="none" stroke="#000000" stroke-linecap="round" stroke-width="2" d="M3 6h18M6 12h12m-9 6h6"/></svg></button>
+    <button class="icon-button" onclick="toggleSearch()"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="#000000" fill-rule="evenodd" d="M18.319 14.433A8.001 8.001 0 0 0 6.343 3.868a8 8 0 0 0 10.564 11.976l.043.045l4.242 4.243a1 1 0 1 0 1.415-1.415l-4.243-4.242zm-2.076-9.15a6 6 0 1 1-8.485 8.485a6 6 0 0 1 8.485-8.485" clip-rule="evenodd"/></svg></button>
+    <input type="text" class="search-input" id="searchInput" placeholder="بحث..." onkeyup="searchSponsors()">
+    <button class="add-sponsor-btn" onclick="openAddSponsorModal()">إضافة</button>
+  </div>
+
+  <!-- Grid Container -->
+  <div class="grid-container" id="sponsorGrid">
+    <div class="sponsor-header">
+      <div class="sponsor-details">
+        <p></p><p>اسم الكفيل</p><p class="hideInMobile">مكان اﻹقامة</p><p>رقم الهاتف</p><p class="hideInMobile">المبلغ</p><p class="hideInMobile">نظام الدفع</p>
+      </div>
+    </div>
+    {% for sponsor in sponsors %}
+    <div class="sponsor-card" 
+          data-id="{{ sponsor.id }}" 
+          data-name="{{ sponsor.name }}" 
+          data-location="{{ sponsor.residence_location }}" 
+          data-phone="{{ sponsor.primary_phone }}" 
+          data-secondary-phone="{{ sponsor.secondary_phone }}"
+          data-amount="{{ sponsor.sponsorship_amount }}" 
+          data-custom-amount="{{ sponsor.custom_amount }}"
+          data-frequency="{{ sponsor.payment_frequency }}" 
+          data-initial-payment="{{ sponsor.initial_payment_timing }}"
+          data-method="{{ sponsor.payment_method }}"
+          data-orphan-selection="{{ sponsor.orphan_selection }}"
+          data-submitted="{{ sponsor.submitted_at|date:"Y/h/m" }}" 
+          onclick="openModal(this)">
+        <div class="sponsor-details">
+          <p>{{forloop.revcounter}}</p>
+          <p class="tableName">{{ sponsor.name }}</p>
+          <p class="hideInMobile">{{ sponsor.residence_location }}</p>
+          <p>{{ sponsor.primary_phone }}</p>
+          <p class="hideInMobile">{{ sponsor.sponsorship_amount }}د.ل</p>
+          <p class="hideInMobile">{{ sponsor.payment_frequency }}</p>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  {% include 'components/footer.html' %}
+
+
+  
+  <!-- Modal for Sponsor Details -->
+  <div class="modal" id="modal">
+    <div class="modal-content">
+      <span class="modal-close" onclick="closeModal()">✖</span>
+      <div id="modalContent"></div>
+      <button class="modal-print" onclick="printModalContent()">طباعة</button>
+      <button class="modal-edit" onclick="openEditSponsorModal(this)" data-id="{{ sponsor.id }}">تعديل</button>
+
+    </div>
+  </div>
+
+<!-- Modal for Adding New Sponsor -->
+<div class="modal" id="addSponsorModal">
+  <div class="modal-content">
+    <span class="modal-close" onclick="closeModal()">✖</span>
+    <h2>إضافة كفيل جديد</h2>
+    <form id="sponsorForm" class="sponsorForm">
+      <!-- Name -->
+      <input type="text" id="name" name="name" placeholder="اسم الكفيل" required><br>
+
+      <!-- City Selection -->
+      <select id="residence_location" name="residence_location" required>
+        <option value="" disabled selected>اختر مكان الإقامة</option>
+        <option value="Misurata">مصراتة</option>
+        <option value="Tripoli">طرابلس</option>
+        <option value="Zletin">زليتن</option>
+        <option value="Alkhoms">الخمس</option>
+        <option value="Banghazi">بنغازي</option>
+        <option value="Msallata">مسلاتة</option>
+        <option value="Alzzawya">الزاوية</option>
+      </select><br>
+
+      <!-- Phone Numbers -->
+      <input type="tel" id="primary_phone" name="primary_phone" placeholder="رقم الهاتف" pattern="[0-9]{10}" required><br>
+      <input type="tel" id="secondary_phone" name="secondary_phone" placeholder="رقم هاتف آخر" pattern="[0-9]{10}"><br>
+
+      <!-- Sponsorship Amount -->
+      <select id="sponsorship_amount" name="sponsorship_amount" required>
+        <option value="" selected>اختر قيمة الكفالة الشهرية</option>
+        <option value="700">700 </option>
+        <option value="600">600 </option>
+        <option value="500">500 </option>
+        <option value="400">400 </option>
+        <option value="300">300 </option>
+        <option value="200">200 </option>
+        <option value="100">100 </option>
+      </select><br>
+
+      <!-- Custom Amount -->
+      <input type="number" id="custom_amount" name="custom_amount" placeholder="قيمة مخصصة (إذا كانت أكبر من 700 دينار)"><br>
+
+      <!-- Payment Frequency -->
+      <select id="payment_frequency" name="payment_frequency" required>
+        <option value="" disabled selected>اختر نظام الدفع</option>
+        <option value="yearly">سنوي</option>
+        <option value="semi_annual">نصف سنوي</option>
+        <option value="quarterly">ربع سنوي</option>
+        <option value="monthly">شهري</option>
+      </select><br>
+
+      <!-- Initial Payment Timing -->
+      <select id="initial_payment_timing" name="initial_payment_timing" required>
+        <option value="" disabled selected>موعد تسليم الدفعة الأولى</option>
+        <option value="this_month">بداية من هذا الشهر</option>
+        <option value="next_month">بداية من الشهر القادم</option>
+      </select><br>
+
+      <!-- Payment Method -->
+      <select id="payment_method" name="payment_method" required>
+        <option value="" disabled selected>اختر وسيلة الدفع</option>
+        <option value="cash">نقدي</option>
+        <option value="exchange_office">التحويل عن طريق مكاتب الصرافة الخاصة</option>
+        <option value="bank_transfer">التحويل المصرفي</option>
+        <option value="card">البطاقة المصرفية</option>
+      </select><br>
+
+      <!-- Orphan Selection -->
+      <select id="orphan_selection" name="orphan_selection" required>
+        <option value="" disabled selected>اختيار اليتيم</option>
+        <option value="self">اريد اختيار اليتيم بنفسي</option>
+        <option value="campaign_assigned">افوض الحملة في اختيار اليتيم وفق المتبع لديها وابلاغي بالمعلومات</option>
+        <option value="no_info">غير مهتم بالحصول على معلومات عن اليتيم مع متابعة تسليم دفعات الكفالة</option>
+      </select><br>
+
+      <button type="submit" class="modal-save">حفظ</button>
+    </form>
+  </div>
+</div>
+
+
+<!-- Modal for Editing Sponsor -->
+<div class="modal" id="editSponsorModal">
+  <div class="modal-content">
+    <span class="modal-close" onclick="closeModal()">✖</span>
+    <h2>تعديل معلومات الكفيل</h2>
+    <form id="editSponsorForm" class="sponsorForm">
+      <!-- Hidden ID Field for Sponsor -->
+      <input type="hidden" id="editSponsorId" name="id">
+      
+      <!-- Sponsor Name -->
+      <input type="text" id="editName" name="name" placeholder="اسم الكفيل" required><br>
+
+      <!-- City Selection -->
+      <select id="editResidenceLocation" name="residence_location" required>
+        <option value="" disabled>اختر مكان الإقامة</option>
+        <option value="Misurata">مصراتة</option>
+        <option value="Tripoli">طرابلس</option>
+        <option value="Zletin">زليتن</option>
+        <option value="Alkhoms">الخمس</option>
+        <option value="Banghazi">بنغازي</option>
+        <option value="Msallata">مسلاتة</option>
+        <option value="Alzzawya">الزاوية</option>
+      </select><br>
+
+      <!-- Primary Phone Number -->
+      <input type="tel" id="editPrimaryPhone" name="primary_phone" placeholder="رقم الهاتف" pattern="[0-9]{10}" required><br>
+
+      <!-- Secondary Phone Number -->
+      <input type="tel" id="editSecondaryPhone" name="secondary_phone" placeholder="رقم هاتف آخر" pattern="[0-9]{10}"><br>
+
+      <!-- Sponsorship Amount -->
+      <select id="editSponsorshipAmount" name="sponsorship_amount">
+        <option value="">اختر قيمة الكفالة الشهرية</option>
+        <option value="700">700 </option>
+        <option value="600">600 </option>
+        <option value="500">500 </option>
+        <option value="400">400 </option>
+        <option value="300">300 </option>
+        <option value="200">200 </option>
+        <option value="100">100 </option>
+      </select><br>
+
+      <!-- Custom Amount -->
+      <input type="number" id="editCustomAmount" name="custom_amount" placeholder="قيمة مخصصة (إذا كانت أكبر من 700 دينار)"><br>
+
+      <!-- Payment Frequency -->
+      <select id="editPaymentFrequency" name="payment_frequency" required>
+        <option value="" disabled>اختر نظام الدفع</option>
+        <option value="yearly">سنوي</option>
+        <option value="semi_annual">نصف سنوي</option>
+        <option value="quarterly">ربع سنوي</option>
+        <option value="monthly">شهري</option>
+      </select><br>
+
+      <!-- Initial Payment Timing -->
+      <select id="editInitialPaymentTiming" name="initial_payment_timing" required>
+        <option value="" disabled>موعد تسليم الدفعة الأولى</option>
+        <option value="this_month">بداية من هذا الشهر</option>
+        <option value="next_month">بداية من الشهر القادم</option>
+      </select><br>
+
+      <!-- Payment Method -->
+      <select id="editPaymentMethod" name="payment_method" required>
+        <option value="" disabled>اختر وسيلة الدفع</option>
+        <option value="cash">نقدي</option>
+        <option value="exchange_office">التحويل عن طريق مكاتب الصرافة الخاصة</option>
+        <option value="bank_transfer">التحويل المصرفي</option>
+        <option value="card">البطاقة المصرفية</option>
+      </select><br>
+
+      <!-- Orphan Selection -->
+      <select id="editOrphanSelection" name="orphan_selection" required>
+        <option value="" disabled>اختيار اليتيم</option>
+        <option value="self">اريد اختيار اليتيم بنفسي</option>
+        <option value="campaign_assigned">افوض الحملة في اختيار اليتيم وفق المتبع لديها وابلاغي بالمعلومات</option>
+        <option value="no_info">غير مهتم بالحصول على معلومات عن اليتيم مع متابعة تسليم دفعات الكفالة</option>
+      </select><br>
+
+      <!-- Submit Button -->
+      <button type="submit" class="modal-save">حفظ</button>
+    </form>
+  </div>
+</div>
+
+
+<script>
+  // CSRF token for secure POST requests
+  const csrfToken = '{{ csrf_token }}';
+  
+
+  // Function to open the Add Sponsor Modal
+  function openAddSponsorModal() {
+    document.getElementById("addSponsorModal").style.display = "block";
+  }
+  
+  // Function to close any open modal
+  function closeModal() {
+    document.getElementById("modal").style.display = "none";
+    document.getElementById("addSponsorModal").style.display = "none";
+    document.getElementById("editSponsorModal").style.display = "none";
+  }
+  
+  // Handle Add Sponsor Form Submission
+  document.getElementById("sponsorForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+  
+    fetch("{% url 'add_sponsor' %}", {
+      method: "POST",
+      headers: { "X-CSRFToken": csrfToken },
+      body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        closeModal();
+        addSponsorCard(data.sponsor);
+        document.getElementById("successMessage").style.display = "block";
+        setTimeout(() => document.getElementById("successMessage").style.display = "none", 3000);
+      } else {
+        alert("Error adding sponsor: " + (data.error || "Unknown error"));
+      }
+    });
+  });
+  
+  
+  function openModal(sponsorCard) {
+    const sponsorId = sponsorCard.getAttribute("data-id");
+    const sponsorName = sponsorCard.getAttribute("data-name");
+    const sponsorLocation = sponsorCard.getAttribute("data-location");
+    const sponsorPhone = sponsorCard.getAttribute("data-phone");
+    const sponsorSecondaryPhone = sponsorCard.getAttribute("data-secondary-phone");
+    const sponsorAmount = sponsorCard.getAttribute("data-amount");
+    const sponsorCustomAmount = sponsorCard.getAttribute("data-custom-amount");
+    const sponsorFrequency = sponsorCard.getAttribute("data-frequency");
+    const sponsorInitialPayment = sponsorCard.getAttribute("data-initial-payment");
+    const sponsorMethod = sponsorCard.getAttribute("data-method");
+    const sponsorOrphanSelection = sponsorCard.getAttribute("data-orphan-selection");
+    // Fix: Get submitted date with fallback
+    const sponsorSubmitted = sponsorCard.getAttribute("data-submitted") || new Date().toISOString().split('T')[0];
+
+    const modalContent = document.getElementById("modalContent");
+    modalContent.innerHTML = `
+      <h2>${sponsorName}</h2>
+      <p><strong>مكان اﻹقامة:</strong> ${sponsorLocation}</p>
+      <p><strong>رقم الهاتف:</strong> ${sponsorPhone}</p>
+      <p><strong>رقم هاتف آخر:</strong> ${sponsorSecondaryPhone}</p>
+      <p><strong>المبلغ:</strong> ${sponsorAmount}د.ل</p>
+      <p><strong>نظام الدفع:</strong> ${sponsorFrequency}</p>
+      <p><strong>موعد الدفعة الأولى:</strong> ${sponsorInitialPayment}</p>
+      <p><strong>وسيلة الدفع:</strong> ${sponsorMethod}</p>
+      <p><strong>اختيار اليتيم:</strong> ${sponsorOrphanSelection}</p>
+      <p><strong>التاريخ:</strong> ${sponsorSubmitted}</p>
+    `;
+
+    document.getElementById("modal").style.display = "block";
+
+    document.querySelector(".modal-edit").onclick = function() {
+      openEditSponsorModal(sponsorCard);
+    };
+}
+
+    
+function openEditSponsorModal(sponsorCard) {
+    // Set hidden ID field
+    document.getElementById("editSponsorId").value = sponsorCard.getAttribute("data-id");
+    
+    // Set text input fields
+    document.getElementById("editName").value = sponsorCard.getAttribute("data-name");
+    document.getElementById("editResidenceLocation").value = sponsorCard.getAttribute("data-location");
+    document.getElementById("editPrimaryPhone").value = sponsorCard.getAttribute("data-phone");
+    document.getElementById("editSecondaryPhone").value = sponsorCard.getAttribute("data-secondary-phone");
+    document.getElementById("editCustomAmount").value = sponsorCard.getAttribute("data-custom-amount");
+
+    // Fix: Use the setSelectValue helper function for all select fields
+    setSelectValue("editSponsorshipAmount", sponsorCard.getAttribute("data-amount"));
+    setSelectValue("editPaymentFrequency", sponsorCard.getAttribute("data-frequency"));
+    setSelectValue("editInitialPaymentTiming", sponsorCard.getAttribute("data-initial-payment"));
+    setSelectValue("editPaymentMethod", sponsorCard.getAttribute("data-method"));
+    setSelectValue("editOrphanSelection", sponsorCard.getAttribute("data-orphan-selection"));
+
+    document.getElementById("editSponsorModal").style.display = "block";
+}
+
+   
+  
+    // Handle Edit Sponsor Form Submission
+    document.getElementById("editSponsorForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+
+    fetch("{% url 'edit_sponsor' %}", {
+      method: "POST",
+      headers: { 
+        "X-CSRFToken": csrfToken,
+        "X-Requested-With": "XMLHttpRequest"  // Ensure AJAX header is sent
+      },
+      body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        closeModal();
+        updateSponsorCard(data.sponsor);
+        openModal(document.querySelector(`.sponsor-card[data-id="${data.sponsor.id}"]`));
+      } else {
+        alert("Error updating sponsor: " + (data.error || "Unknown error"));
+      }
+    })
+    .catch(error => console.error("Error in fetch:", error));
+  });
+
+  
+  function addSponsorCard(sponsor) {
+    const sponsorGrid = document.getElementById("sponsorGrid");
+    const sponsorHeader = sponsorGrid.querySelector(".sponsor-header");
+  
+    const sponsorCard = document.createElement("div");
+    sponsorCard.classList.add("sponsor-card");
+  
+    // Set all data attributes
+    sponsorCard.setAttribute("data-id", sponsor.id);
+    sponsorCard.setAttribute("data-name", sponsor.name);
+    sponsorCard.setAttribute("data-location", sponsor.residence_location);
+    sponsorCard.setAttribute("data-phone", sponsor.primary_phone);
+    sponsorCard.setAttribute("data-secondary-phone", sponsor.secondary_phone);
+    sponsorCard.setAttribute("data-amount", sponsor.sponsorship_amount);
+    sponsorCard.setAttribute("data-custom-amount", sponsor.custom_amount);
+    sponsorCard.setAttribute("data-frequency", sponsor.payment_frequency);
+    sponsorCard.setAttribute("data-initial-payment", sponsor.initial_payment_timing);
+    sponsorCard.setAttribute("data-method", sponsor.payment_method);
+    sponsorCard.setAttribute("data-orphan-selection", sponsor.orphan_selection);
+    // Fix: Set the submitted date properly
+    sponsorCard.setAttribute("data-submitted", sponsor.submitted || new Date().toISOString().split('T')[0]);
+
+    sponsorCard.innerHTML = `
+      <div class="sponsor-details">
+        <p>${sponsor.counter}</p>
+        <p class="tableName">${sponsor.name}</p>
+        <p class="hideInMobile">${sponsor.residence_location}</p>
+        <p>${sponsor.primary_phone}</p>
+        <p class="hideInMobile">${sponsor.sponsorship_amount}د.ل</p>
+        <p class="hideInMobile">${sponsor.payment_frequency}</p>
+      </div>
+    `;
+  
+    sponsorCard.addEventListener("click", function () {
+      openModal(sponsorCard);
+    });
+  
+    sponsorHeader.insertAdjacentElement("afterend", sponsorCard);
+}
+
+
+// Improved setSelectValue helper function
+function setSelectValue(selectId, value) {
+    const select = document.getElementById(selectId);
+    if (select && value) {
+        // First try exact match
+        let option = Array.from(select.options).find(opt => opt.value === value);
+        
+        // If no exact match, try case-insensitive match
+        if (!option) {
+            option = Array.from(select.options).find(opt => 
+                opt.value.toLowerCase() === value.toLowerCase());
+        }
+        
+        if (option) {
+            select.value = option.value;
+        }
+    }
+}
+
+  function updateSponsorCard(sponsor) {
+      const sponsorCard = document.querySelector(`.sponsor-card[data-id="${sponsor.id}"]`);
+      if (sponsorCard) {
+          // Update all data attributes
+          sponsorCard.setAttribute("data-name", sponsor.name);
+          sponsorCard.setAttribute("data-location", sponsor.residence_location);
+          sponsorCard.setAttribute("data-phone", sponsor.primary_phone);
+          sponsorCard.setAttribute("data-secondary-phone", sponsor.secondary_phone);
+          sponsorCard.setAttribute("data-amount", sponsor.sponsorship_amount);
+          sponsorCard.setAttribute("data-custom-amount", sponsor.custom_amount);
+          sponsorCard.setAttribute("data-frequency", sponsor.payment_frequency);
+          sponsorCard.setAttribute("data-initial-payment", sponsor.initial_payment_timing);
+          sponsorCard.setAttribute("data-method", sponsor.payment_method);
+          sponsorCard.setAttribute("data-orphan-selection", sponsor.orphan_selection);
+          sponsorCard.getAttribute("data-submitted");
+
+          // Update visible content
+          const details = sponsorCard.querySelector(".sponsor-details");
+          details.innerHTML = `
+              <p>#</p>
+              <p class="tableName">${sponsor.name}</p>
+              <p class="hideInMobile">${sponsor.residence_location}</p>
+              <p>${sponsor.primary_phone}</p>
+              <p class="hideInMobile">${sponsor.sponsorship_amount}د.ل</p>
+              <p class="hideInMobile">${sponsor.payment_frequency}</p>
+          `;
+      }
+  }
+  
+  function printModalContent() {
+    const modalContent = document.getElementById("modalContent").innerHTML;
+    const printWindow = window.open("", "_blank");
+    printWindow.document.write("<html><head><title>Print</title></head><body>");
+    printWindow.document.write(modalContent);
+    printWindow.document.write("</body></html>");
+    printWindow.document.close();
+    printWindow.print();
+  }
+  </script>
+
+
+<script>
+
+  // Sorting and Searching Functions
+  function sortByDate() {
+    const sponsorGrid = document.getElementById("sponsorGrid");
+    const cards = Array.from(sponsorGrid.getElementsByClassName("sponsor-card"));
+
+    cards.sort((a, b) => new Date(a.getAttribute("data-submitted")) - new Date(b.getAttribute("data-submitted")));
+    cards.forEach(card => sponsorGrid.appendChild(card));
+  }
+
+  function sortByName() {
+    const sponsorGrid = document.getElementById("sponsorGrid");
+    const cards = Array.from(sponsorGrid.getElementsByClassName("sponsor-card"));
+
+    cards.sort((a, b) => a.getAttribute("data-name").localeCompare(b.getAttribute("data-name")));
+    cards.forEach(card => sponsorGrid.appendChild(card));
+  }
+
+  function toggleSearch() {
+    const searchInput = document.getElementById("searchInput");
+    searchInput.classList.toggle("show");
+  }
+
+  function searchSponsors() {
+    const filter = document.getElementById("searchInput").value.toLowerCase();
+    const cards = document.getElementsByClassName("sponsor-card");
+
+    Array.from(cards).forEach(card => {
+      const name = card.getAttribute("data-name").toLowerCase();
+      card.style.display = name.includes(filter) ? "grid" : "none";
+    });
+  }
+</script>
+
+</body>
+</html>
